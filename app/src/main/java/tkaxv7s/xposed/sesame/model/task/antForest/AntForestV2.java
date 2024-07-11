@@ -1013,7 +1013,7 @@ public class AntForestV2 extends ModelTask {
                     if (!extInfo.isEmpty()) {
                         JSONObject extInfoObj = new JSONObject(extInfo);
                         double leftEnergy = Double.parseDouble(extInfoObj.optString("leftEnergy", "0"));
-                        if (leftEnergy > 300 || ("true".equals(extInfoObj.optString("overLimitToday", "false")) && leftEnergy >= 1)) {
+                        if (leftEnergy > 330 || ("true".equals(extInfoObj.optString("overLimitToday", "false")) && leftEnergy >= 1)) {
                             String propId = userUsingProp.getString("propId");
                             String propType = userUsingProp.getString("propType");
                             try {
