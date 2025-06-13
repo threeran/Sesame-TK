@@ -3,6 +3,7 @@ package tkaxv7s.xposed.sesame.model.task.reserve;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import tkaxv7s.xposed.sesame.data.ModelFields;
+import tkaxv7s.xposed.sesame.data.ModelGroup;
 import tkaxv7s.xposed.sesame.data.modelFieldExt.SelectAndCountModelField;
 import tkaxv7s.xposed.sesame.data.task.ModelTask;
 import tkaxv7s.xposed.sesame.entity.AlipayReserve;
@@ -23,6 +24,11 @@ public class Reserve extends ModelTask {
         return "保护地";
     }
 
+    @Override
+    public ModelGroup getGroup() {
+        return ModelGroup.FOREST;
+    }
+
     private SelectAndCountModelField reserveList;
 
     @Override
@@ -33,10 +39,7 @@ public class Reserve extends ModelTask {
     }
 
     public Boolean check() {
-        if (TaskCommon.IS_ENERGY_TIME) {
-            return false;
-        }
-        return true;
+        return !TaskCommon.IS_ENERGY_TIME;
     }
 
     public void run() {

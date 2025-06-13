@@ -25,7 +25,7 @@ public class GenAI implements AnswerAIInterface {
         if (token != null && !token.isEmpty()) {
             this.token = token;
         } else {
-            this.token = "AIzaSyA8e1SjuCbZBfx8nDRjmoMHZsWdd3y4-bQ";
+            this.token = "";
         }
         /*if (cUrl != null && !cUrl.isEmpty()) {
             url = cUrl.trim().replaceAll("/$", "");
@@ -69,6 +69,7 @@ public class GenAI implements AnswerAIInterface {
             String json = response.body().string();
             if (!response.isSuccessful()) {
                 Log.other("Gemini请求失败");
+                Log.i("Gemini接口异常：" + json);
                 //可能key出错了
                 return result;
             }

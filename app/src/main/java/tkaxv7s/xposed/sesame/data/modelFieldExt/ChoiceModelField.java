@@ -11,9 +11,8 @@ import android.widget.LinearLayout;
 import tkaxv7s.xposed.sesame.R;
 import tkaxv7s.xposed.sesame.data.ModelField;
 import tkaxv7s.xposed.sesame.ui.ChoiceDialog;
-import tkaxv7s.xposed.sesame.util.JsonUtil;
 
-public class ChoiceModelField extends ModelField {
+public class ChoiceModelField extends ModelField<Integer> {
 
     private String[] choiceArray;
 
@@ -36,24 +35,11 @@ public class ChoiceModelField extends ModelField {
     }
 
     @Override
-    public void setValue(Object value) {
-        if (value == null) {
-            value = defaultValue;
-        }
-        this.value = JsonUtil.parseObject(value, Integer.class);
-    }
-
-    @Override
-    public Integer getValue() {
-        return (Integer) value;
-    }
-
-    @Override
     public View getView(Context context) {
         Button btn = new Button(context);
         btn.setText(getName());
         btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        btn.setTextColor(Color.parseColor("#008175"));
+        btn.setTextColor(Color.parseColor("#216EEE"));
         btn.setBackground(context.getResources().getDrawable(R.drawable.button));
         btn.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
         btn.setMinHeight(150);

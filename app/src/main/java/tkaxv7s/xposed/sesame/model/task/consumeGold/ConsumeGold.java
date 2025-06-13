@@ -3,6 +3,7 @@ package tkaxv7s.xposed.sesame.model.task.consumeGold;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import tkaxv7s.xposed.sesame.data.ModelFields;
+import tkaxv7s.xposed.sesame.data.ModelGroup;
 import tkaxv7s.xposed.sesame.data.task.ModelTask;
 import tkaxv7s.xposed.sesame.data.RuntimeInfo;
 import tkaxv7s.xposed.sesame.model.base.TaskCommon;
@@ -14,6 +15,11 @@ public class ConsumeGold extends ModelTask {
     @Override
     public String getName() {
         return "消费金";
+    }
+
+    @Override
+    public ModelGroup getGroup() {
+        return ModelGroup.OTHER;
     }
 
     @Override
@@ -51,7 +57,7 @@ public class ConsumeGold extends ModelTask {
         try {
             String s = ConsumeGoldRpcCall.taskV2Index(taskSceneCode);
             JSONObject jo = new JSONObject(s);
-            if (jo.getBoolean("success")) {
+            if (jo.optBoolean("success")) {
                 JSONArray taskList = jo.getJSONArray("taskList");
                 for (int i = 0; i < taskList.length(); i++) {
                     jo = taskList.getJSONObject(i);
@@ -87,7 +93,7 @@ public class ConsumeGold extends ModelTask {
         try {
             String s = ConsumeGoldRpcCall.taskV2TriggerReceive(taskId);
             JSONObject jo = new JSONObject(s);
-            if (jo.getBoolean("success")) {
+            if (jo.optBoolean("success")) {
                 int receiveAmount = jo.getInt("receiveAmount");
                 Log.other("赚消费金💰[" + name + "]#" + receiveAmount);
             }
@@ -101,7 +107,7 @@ public class ConsumeGold extends ModelTask {
         try {
             String s = ConsumeGoldRpcCall.taskV2TriggerSignUp(taskId);
             JSONObject jo = new JSONObject(s);
-            if (jo.getBoolean("success")) {
+            if (jo.optBoolean("success")) {
 
             }
         } catch (Throwable t) {
@@ -114,7 +120,7 @@ public class ConsumeGold extends ModelTask {
         try {
             String s = ConsumeGoldRpcCall.taskV2TriggerSend(taskId);
             JSONObject jo = new JSONObject(s);
-            if (jo.getBoolean("success")) {
+            if (jo.optBoolean("success")) {
 
             }
         } catch (Throwable t) {
@@ -127,7 +133,7 @@ public class ConsumeGold extends ModelTask {
         try {
             String s = ConsumeGoldRpcCall.consumeGoldIndex();
             JSONObject jo = new JSONObject(s);
-            if (jo.getBoolean("success")) {
+            if (jo.optBoolean("success")) {
                 JSONObject homePromoInfoDTO = jo.getJSONObject("homePromoInfoDTO");
                 JSONArray homePromoTokenDTOList = homePromoInfoDTO.getJSONArray("homePromoTokenDTOList");
                 int tokenLeftAmount = 0;
@@ -142,7 +148,7 @@ public class ConsumeGold extends ModelTask {
                 if (tokenLeftAmount > 0) {
                     for (int j = 0; j < tokenLeftAmount; j++) {
                         jo = new JSONObject(ConsumeGoldRpcCall.promoTrigger());
-                        if (jo.getBoolean("success")) {
+                        if (jo.optBoolean("success")) {
                             JSONObject homePromoPrizeInfoDTO = jo.getJSONObject("homePromoPrizeInfoDTO");
                             int quantity = homePromoPrizeInfoDTO.getInt("quantity");
                             Log.other("赚消费金💰[投5币抽]#" + quantity);
@@ -166,11 +172,11 @@ public class ConsumeGold extends ModelTask {
         try {
             String s = ConsumeGoldRpcCall.signinCalendar();
             JSONObject jo = new JSONObject(s);
-            if (jo.getBoolean("success")) {
+            if (jo.optBoolean("success")) {
                 boolean signed = jo.getBoolean("isSignInToday");
                 if (!signed) {
                     jo = new JSONObject(ConsumeGoldRpcCall.openBoxAward());
-                    if (jo.getBoolean("success")) {
+                    if (jo.optBoolean("success")) {
                         int amount = jo.getInt("amount");
                         Log.other("消费金签到💰[" + amount + "金币]");
                     }

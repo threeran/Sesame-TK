@@ -19,7 +19,7 @@ import java.util.TimeZone;
 @SuppressLint("SimpleDateFormat")
 public class JsonUtil {
 
-    public static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     public static final TypeFactory TYPE_FACTORY = TypeFactory.defaultInstance();
 
@@ -40,7 +40,7 @@ public class JsonUtil {
         return MAPPER.copy();
     }
 
-    public static String toNoFormatJsonString(Object object) {
+    public static String toJsonString(Object object) {
         try {
             return MAPPER.writeValueAsString(object);
         } catch (Exception e) {
@@ -48,7 +48,7 @@ public class JsonUtil {
         }
     }
 
-    public static String toJsonString(Object object) {
+    public static String toFormatJsonString(Object object) {
         try {
             return MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(object);
         } catch (Exception e) {

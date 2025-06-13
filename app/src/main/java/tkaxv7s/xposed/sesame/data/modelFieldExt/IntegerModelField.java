@@ -13,10 +13,9 @@ import tkaxv7s.xposed.sesame.R;
 import tkaxv7s.xposed.sesame.data.ModelField;
 import tkaxv7s.xposed.sesame.ui.StringDialog;
 import tkaxv7s.xposed.sesame.util.Log;
-import tkaxv7s.xposed.sesame.util.StringUtil;
 
 @Getter
-public class IntegerModelField extends ModelField {
+public class IntegerModelField extends ModelField<Integer> {
 
     protected final Integer minLimit;
 
@@ -40,16 +39,21 @@ public class IntegerModelField extends ModelField {
     }
 
     @Override
-    public void setValue(Object value) {
+    public String getConfigValue() {
+        return String.valueOf(value);
+    }
+
+    @Override
+    public void setConfigValue(String configValue) {
         Integer newValue;
-        if (value == null) {
-            newValue = (Integer) defaultValue;
+        if (configValue == null) {
+            newValue = defaultValue;
         } else {
             try {
-                newValue = Integer.parseInt(value.toString());
+                newValue = Integer.parseInt(configValue);
             } catch (Exception e) {
                 Log.printStackTrace(e);
-                newValue = (Integer) defaultValue;
+                newValue = defaultValue;
             }
         }
         if (minLimit != null) {
@@ -62,16 +66,11 @@ public class IntegerModelField extends ModelField {
     }
 
     @Override
-    public Integer getValue() {
-        return (Integer) value;
-    }
-
-    @Override
     public View getView(Context context) {
         Button btn = new Button(context);
         btn.setText(getName());
         btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        btn.setTextColor(Color.parseColor("#008175"));
+        btn.setTextColor(Color.parseColor("#216EEE"));
         btn.setBackground(context.getResources().getDrawable(R.drawable.button));
         btn.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
         btn.setMinHeight(150);
@@ -88,7 +87,7 @@ public class IntegerModelField extends ModelField {
         private final Integer multiple;
 
         public MultiplyIntegerModelField(String code, String name, Integer value, Integer minLimit, Integer maxLimit, Integer multiple) {
-            super(code, name, value * multiple, minLimit * multiple, maxLimit * multiple);
+            super(code, name, value * multiple, minLimit, maxLimit);
             this.multiple = multiple;
         }
 
@@ -98,23 +97,26 @@ public class IntegerModelField extends ModelField {
         }
 
         @Override
-        public void setConfigValue(String value) {
-            if (value == null) {
-                setValue(null);
+        public void setConfigValue(String configValue) {
+            if (configValue == null) {
+                reset();
                 return;
             }
+            super.setConfigValue(configValue);
             try {
-                setValue(Integer.parseInt(value) * multiple);
+                value = value * multiple;
+                return;
             } catch (Exception e) {
                 Log.printStackTrace(e);
-                setValue(null);
             }
+            reset();
         }
 
         @Override
         public String getConfigValue() {
-            return String.valueOf(getValue() / multiple);
+            return String.valueOf(value / multiple);
         }
+
     }
 
 }

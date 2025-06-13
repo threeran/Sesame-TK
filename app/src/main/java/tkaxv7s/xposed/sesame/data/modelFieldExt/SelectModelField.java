@@ -8,15 +8,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import com.fasterxml.jackson.core.type.TypeReference;
 import tkaxv7s.xposed.sesame.R;
 import tkaxv7s.xposed.sesame.data.ModelField;
 import tkaxv7s.xposed.sesame.data.modelFieldExt.common.SelectModelFieldFunc;
 import tkaxv7s.xposed.sesame.entity.IdAndName;
 import tkaxv7s.xposed.sesame.ui.ListDialog;
-import tkaxv7s.xposed.sesame.util.JsonUtil;
 
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -25,10 +22,7 @@ import java.util.Set;
  * Set<String> 表示已选择的数据
  * List<? extends IdAndName> 需要选择的数据
  */
-public class SelectModelField extends ModelField implements SelectModelFieldFunc {
-
-    private static final TypeReference<LinkedHashSet<String>> typeReference = new TypeReference<LinkedHashSet<String>>() {
-    };
+public class SelectModelField extends ModelField<Set<String>> implements SelectModelFieldFunc {
 
     private SelectListFunc selectListFunc;
 
@@ -54,28 +48,11 @@ public class SelectModelField extends ModelField implements SelectModelFieldFunc
     }
 
     @Override
-    public void setValue(Object value) {
-        if (value == null) {
-            value = defaultValue;
-        }
-        this.value = JsonUtil.parseObject(value, typeReference);
-    }
-
-    @Override
-    public Set<String> getValue() {
-        return (Set<String>) value;
-    }
-
-    public String getConfigValue() {
-        return JsonUtil.toNoFormatJsonString(value);
-    }
-
-    @Override
     public View getView(Context context) {
         Button btn = new Button(context);
         btn.setText(getName());
         btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        btn.setTextColor(Color.parseColor("#008175"));
+        btn.setTextColor(Color.parseColor("#216EEE"));
         btn.setBackground(context.getResources().getDrawable(R.drawable.button));
         btn.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
         btn.setMinHeight(150);

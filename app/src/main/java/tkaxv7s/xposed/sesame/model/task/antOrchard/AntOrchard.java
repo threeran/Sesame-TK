@@ -3,6 +3,7 @@ package tkaxv7s.xposed.sesame.model.task.antOrchard;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import tkaxv7s.xposed.sesame.data.ModelFields;
+import tkaxv7s.xposed.sesame.data.ModelGroup;
 import tkaxv7s.xposed.sesame.data.modelFieldExt.BooleanModelField;
 import tkaxv7s.xposed.sesame.data.modelFieldExt.IntegerModelField;
 import tkaxv7s.xposed.sesame.data.modelFieldExt.SelectModelField;
@@ -11,9 +12,8 @@ import tkaxv7s.xposed.sesame.entity.AlipayUser;
 import tkaxv7s.xposed.sesame.model.base.TaskCommon;
 import tkaxv7s.xposed.sesame.util.*;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
+import android.util.Base64;
+import java.util.*;
 
 public class AntOrchard extends ModelTask {
     private static final String TAG = AntOrchard.class.getSimpleName();
@@ -31,10 +31,17 @@ public class AntOrchard extends ModelTask {
     private BooleanModelField batchHireAnimal;
     private SelectModelField dontHireList;
     private SelectModelField dontWeedingList;
+    // 助力好友列表
+    private SelectModelField assistFriendList;
 
     @Override
     public String getName() {
         return "农场";
+    }
+
+    @Override
+    public ModelGroup getGroup() {
+        return ModelGroup.ORCHARD;
     }
 
     @Override
@@ -43,6 +50,7 @@ public class AntOrchard extends ModelTask {
         modelFields.addField(executeInterval = new IntegerModelField("executeInterval", "执行间隔(毫秒)", 500));
         modelFields.addField(receiveOrchardTaskAward = new BooleanModelField("receiveOrchardTaskAward", "收取农场任务奖励", false));
         modelFields.addField(orchardSpreadManureCount = new IntegerModelField("orchardSpreadManureCount", "农场每日施肥次数", 0));
+        modelFields.addField(assistFriendList = new SelectModelField("assistFriendList", "助力好友列表", new LinkedHashSet<>(), AlipayUser::getList));
         modelFields.addField(batchHireAnimal = new BooleanModelField("batchHireAnimal", "一键捉鸡除草", false));
         modelFields.addField(dontHireList = new SelectModelField("dontHireList", "除草 | 不雇佣好友列表", new LinkedHashSet<>(), AlipayUser::getList));
         modelFields.addField(dontWeedingList = new SelectModelField("dontWeedingList", "除草 | 不除草好友列表", new LinkedHashSet<>(), AlipayUser::getList));
@@ -90,7 +98,8 @@ public class AntOrchard extends ModelTask {
                         } else if (orchardSpreadManureCountValue >= 10) {
                             querySubplotsActivity(10);
                         }
-
+                        // 助力
+                        orchardassistFriend();
                     } else {
                         Log.record(jo.getString("resultDesc"));
                         Log.i(jo.toString());
@@ -148,7 +157,7 @@ public class AntOrchard extends ModelTask {
                             String taskType = spreadManureStage.getString("taskType");
                             int awardCount = spreadManureStage.getInt("awardCount");
                             JSONObject joo = new JSONObject(AntOrchardRpcCall.receiveTaskAward(sceneCode, taskType));
-                            if (joo.getBoolean("success")) {
+                            if (joo.optBoolean("success")) {
                                 Log.farm("丰收礼包🎁[肥料*" + awardCount + "]");
                             } else {
                                 Log.record(joo.getString("desc"));
@@ -282,7 +291,7 @@ public class AntOrchard extends ModelTask {
                         String taskId = jo.getString("taskId");
                         String sceneCode = jo.getString("sceneCode");
                         jo = new JSONObject(AntOrchardRpcCall.finishTask(userId, sceneCode, taskId));
-                        if (jo.getBoolean("success")) {
+                        if (jo.optBoolean("success")) {
                             Log.farm("农场任务🧾[" + title + "]");
                         } else {
                             Log.record(jo.getString("desc"));
@@ -444,6 +453,38 @@ public class AntOrchard extends ModelTask {
             }
         } catch (Throwable t) {
             Log.i(TAG, "batchHireAnimalRecommend err:");
+            Log.printStackTrace(TAG, t);
+        }
+    }
+
+    // 助力
+    private void orchardassistFriend() {
+        try {
+            if (!Status.canAntOrchardAssistFriendToday()) {
+                return;
+            }
+            Set<String> friendSet = assistFriendList.getValue();
+            for (String uid : friendSet) {
+                String shareId = Base64.encodeToString((uid + "-" + RandomUtil.getRandom(5) + "ANTFARM_ORCHARD_SHARE_P2P").getBytes(), Base64.NO_WRAP);
+                String str = AntOrchardRpcCall.achieveBeShareP2P(shareId);
+                JSONObject jsonObject = new JSONObject(str);
+                Thread.sleep(5000);
+                String name = UserIdMap.getMaskName(uid);
+                if (!jsonObject.optBoolean("success")) {
+                    String code = jsonObject.getString("code");
+                    if ("600000027".equals(code)) {
+                        Log.record("农场助力💪今日助力他人次数上限");
+                        Status.antOrchardAssistFriendToday();
+                        return;
+                    }
+                    Log.record("农场助力😔失败[" + name + "]" + jsonObject.optString("desc"));
+                    continue;
+                }
+                Log.farm("农场助力💪[助力:" + name + "]");
+            }
+            Status.antOrchardAssistFriendToday();
+        } catch (Throwable t) {
+            Log.i(TAG, "orchardassistFriend err:");
             Log.printStackTrace(TAG, t);
         }
     }

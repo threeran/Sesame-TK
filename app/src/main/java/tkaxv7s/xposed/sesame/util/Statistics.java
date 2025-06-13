@@ -72,19 +72,13 @@ public class Statistics {
     }
 
     public static String getText() {
-        StringBuilder sb = new StringBuilder(getData(TimeType.YEAR, DataType.TIME) + "年 : 收 ");
-        sb.append(getData(TimeType.YEAR, DataType.COLLECTED));
-        sb.append(",   帮 ").append(getData(TimeType.YEAR, DataType.HELPED));
-        sb.append(",   浇 ").append(getData(TimeType.YEAR, DataType.WATERED));
-        sb.append("\n").append(getData(TimeType.MONTH, DataType.TIME)).append("月 : 收 ");
-        sb.append(getData(TimeType.MONTH, DataType.COLLECTED));
-        sb.append(",   帮 ").append(getData(TimeType.MONTH, DataType.HELPED));
-        sb.append(",   浇 ").append(getData(TimeType.MONTH, DataType.WATERED));
-        sb.append("\n").append(getData(TimeType.DAY, DataType.TIME)).append("日 : 收 ");
-        sb.append(getData(TimeType.DAY, DataType.COLLECTED));
-        sb.append(",   帮 ").append(getData(TimeType.DAY, DataType.HELPED));
-        sb.append(",   浇 ").append(getData(TimeType.DAY, DataType.WATERED));
-        return sb.toString();
+
+        StringBuilder table = new StringBuilder();
+        // 添加表头
+        table.append("今年  收: ").append(getData(TimeType.YEAR, DataType.COLLECTED)).append(" 帮: ").append(getData(TimeType.YEAR, DataType.HELPED)).append(" 浇: ").append(getData(TimeType.YEAR, DataType.WATERED));
+        table.append("\n今月  收: ").append(getData(TimeType.MONTH, DataType.COLLECTED)).append(" 帮: ").append(getData(TimeType.MONTH, DataType.HELPED)).append(" 浇: ").append(getData(TimeType.MONTH, DataType.WATERED));
+        table.append("\n今日  收: ").append(getData(TimeType.DAY, DataType.COLLECTED)).append(" 帮: ").append(getData(TimeType.DAY, DataType.HELPED)).append(" 浇: ").append(getData(TimeType.DAY, DataType.WATERED));
+        return table.toString();
     }
 
     public static synchronized Statistics load() {
@@ -92,26 +86,26 @@ public class Statistics {
             File statisticsFile = FileUtil.getStatisticsFile();
             if (statisticsFile.exists()) {
                 String json = FileUtil.readFromFile(statisticsFile);
-                JsonUtil.MAPPER.readerForUpdating(INSTANCE).readValue(json);
-                String formatted = JsonUtil.toJsonString(INSTANCE);
+                JsonUtil.copyMapper().readerForUpdating(INSTANCE).readValue(json);
+                String formatted = JsonUtil.toFormatJsonString(INSTANCE);
                 if (formatted != null && !formatted.equals(json)) {
                     Log.i(TAG, "重新格式化 statistics.json");
                     Log.system(TAG, "重新格式化 statistics.json");
                     FileUtil.write2File(formatted, statisticsFile);
                 }
             } else {
-                JsonUtil.MAPPER.updateValue(INSTANCE, new Statistics());
+                JsonUtil.copyMapper().updateValue(INSTANCE, new Statistics());
                 Log.i(TAG, "初始化 statistics.json");
                 Log.system(TAG, "初始化 statistics.json");
-                FileUtil.write2File(JsonUtil.toJsonString(INSTANCE), statisticsFile);
+                FileUtil.write2File(JsonUtil.toFormatJsonString(INSTANCE), statisticsFile);
             }
         } catch (Throwable t) {
             Log.printStackTrace(TAG, t);
             Log.i(TAG, "统计文件格式有误，已重置统计文件");
             Log.system(TAG, "统计文件格式有误，已重置统计文件");
             try {
-                JsonUtil.MAPPER.updateValue(INSTANCE, new Statistics());
-                FileUtil.write2File(JsonUtil.toJsonString(INSTANCE), FileUtil.getStatisticsFile());
+                JsonUtil.copyMapper().updateValue(INSTANCE, new Statistics());
+                FileUtil.write2File(JsonUtil.toFormatJsonString(INSTANCE), FileUtil.getStatisticsFile());
             } catch (JsonMappingException e) {
                 Log.printStackTrace(TAG, e);
             }
@@ -121,7 +115,7 @@ public class Statistics {
 
     public static synchronized void unload() {
         try {
-            JsonUtil.MAPPER.updateValue(INSTANCE, new Statistics());
+            JsonUtil.copyMapper().updateValue(INSTANCE, new Statistics());
         } catch (JsonMappingException e) {
             Log.printStackTrace(TAG, e);
         }
@@ -137,7 +131,7 @@ public class Statistics {
         } else {
             Log.system(TAG, "保存 statistics.json");
         }
-        FileUtil.write2File(JsonUtil.toJsonString(INSTANCE), FileUtil.getStatisticsFile());
+        FileUtil.write2File(JsonUtil.toFormatJsonString(INSTANCE), FileUtil.getStatisticsFile());
     }
 
     public static Boolean updateDay(Calendar nowCalendar) {

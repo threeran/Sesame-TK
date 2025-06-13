@@ -12,12 +12,11 @@ import tkaxv7s.xposed.sesame.data.ModelField;
 import tkaxv7s.xposed.sesame.data.modelFieldExt.common.SelectModelFieldFunc;
 import tkaxv7s.xposed.sesame.entity.IdAndName;
 import tkaxv7s.xposed.sesame.ui.ListDialog;
-import tkaxv7s.xposed.sesame.util.JsonUtil;
 
 import java.util.List;
 import java.util.Objects;
 
-public class SelectOneModelField extends ModelField implements SelectModelFieldFunc {
+public class SelectOneModelField extends ModelField<String> implements SelectModelFieldFunc {
 
     private SelectListFunc selectListFunc;
 
@@ -43,28 +42,11 @@ public class SelectOneModelField extends ModelField implements SelectModelFieldF
     }
 
     @Override
-    public void setValue(Object value) {
-        if (value == null) {
-            value = defaultValue;
-        }
-        this.value = String.valueOf(value);
-    }
-
-    @Override
-    public String getValue() {
-        return (String) value;
-    }
-
-    public String getConfigValue() {
-        return JsonUtil.toNoFormatJsonString(value);
-    }
-
-    @Override
     public View getView(Context context) {
         Button btn = new Button(context);
         btn.setText(getName());
         btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        btn.setTextColor(Color.parseColor("#008175"));
+        btn.setTextColor(Color.parseColor("#216EEE"));
         btn.setBackground(context.getResources().getDrawable(R.drawable.button));
         btn.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
         btn.setMinHeight(150);

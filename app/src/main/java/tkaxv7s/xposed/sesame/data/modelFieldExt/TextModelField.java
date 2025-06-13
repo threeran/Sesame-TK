@@ -8,13 +8,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import tkaxv7s.xposed.sesame.R;
 import tkaxv7s.xposed.sesame.data.ModelField;
 import tkaxv7s.xposed.sesame.ui.StringDialog;
 
-public class TextModelField extends ModelField {
+public class TextModelField extends ModelField<String> {
 
     public TextModelField(String code, String name, String value) {
         super(code, name, value);
@@ -26,16 +25,13 @@ public class TextModelField extends ModelField {
     }
 
     @Override
-    public void setValue(Object value) {
-        if (value == null) {
-            value = defaultValue;
-        }
-        this.value = String.valueOf(value);
+    public String getConfigValue() {
+        return value;
     }
 
     @Override
-    public String getValue() {
-        return (String) value;
+    public void setConfigValue(String configValue) {
+        value = configValue;
     }
 
     @JsonIgnore
@@ -43,7 +39,7 @@ public class TextModelField extends ModelField {
         Button btn = new Button(context);
         btn.setText(getName());
         btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        btn.setTextColor(Color.parseColor("#008175"));
+        btn.setTextColor(Color.parseColor("#216EEE"));
         btn.setBackground(context.getResources().getDrawable(R.drawable.button));
         btn.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
         btn.setMinHeight(150);

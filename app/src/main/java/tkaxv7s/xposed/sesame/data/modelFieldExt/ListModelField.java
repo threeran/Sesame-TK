@@ -11,12 +11,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import tkaxv7s.xposed.sesame.R;
 import tkaxv7s.xposed.sesame.data.ModelField;
 import tkaxv7s.xposed.sesame.ui.StringDialog;
-import tkaxv7s.xposed.sesame.util.JsonUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListModelField extends ModelField {
+public class ListModelField extends ModelField<List<String>> {
 
     private static final TypeReference<List<String>> typeReference = new TypeReference<List<String>>() {
     };
@@ -31,24 +30,11 @@ public class ListModelField extends ModelField {
     }
 
     @Override
-    public void setValue(Object value) {
-        if (value == null) {
-            value = defaultValue;
-        }
-        this.value = JsonUtil.parseObject(value, typeReference);
-    }
-
-    @Override
-    public List<String> getValue() {
-        return (List<String>) value;
-    }
-
-    @Override
     public View getView(Context context) {
         Button btn = new Button(context);
         btn.setText(getName());
         btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        btn.setTextColor(Color.parseColor("#008175"));
+        btn.setTextColor(Color.parseColor("#216EEE"));
         btn.setBackground(context.getResources().getDrawable(R.drawable.button));
         btn.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
         btn.setMinHeight(150);
@@ -66,13 +52,13 @@ public class ListModelField extends ModelField {
         }
 
         @Override
-        public void setConfigValue(String value) {
-            if (value == null) {
-                setValue(null);
+        public void setConfigValue(String configValue) {
+            if (configValue == null) {
+                reset();
                 return;
             }
             List<String> list = new ArrayList<>();
-            String[] split = value.split(",");
+            String[] split = configValue.split(",");
             if (split.length == 1) {
                 String str = split[0];
                 if (!str.isEmpty()) {
@@ -85,12 +71,12 @@ public class ListModelField extends ModelField {
                     }
                 }
             }
-            setValue(list);
+            value = list;
         }
 
         @Override
         public String getConfigValue() {
-            return String.join(",", getValue());
+            return String.join(",", value);
         }
     }
 
